@@ -17,4 +17,8 @@
 * start.py: Final assignment script, using code from the above scripts to start the load balancer and three backend servers all in **different processes (multi-process server)**.
 
 ### How to run
-python start.py
+* For multiprocessing servers
+python start.py 
+
+* For single process servers
+python start\_singleProcess.py
