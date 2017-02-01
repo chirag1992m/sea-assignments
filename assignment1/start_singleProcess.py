@@ -12,43 +12,51 @@ import tornado.ioloop as iol
 import tornado.httpserver as https
 import tornado.gen as gen
 import tornado.httpclient as httpc
-import tornado.process as proc
 
 #Class to handle incoming web requests
 #Only handles the GET request
 class BackendHandler(web.RequestHandler):
 
-	#GET request handler
-	def get(self):
-		#Simple Hello World application
-		self.write(self.request.host)
+        #GET request handler
+        def get(self):
+                #Simple Hello World application
+                self.write(self.request.host)
 
 #Generator to generate a port
 #Uses current user hash to
 #choose a random base port
-def GetBasePort():
-	MAX_PORT = 50000
-	MIN_PORT = 10000
-	BASE_PORT = int(hashlib.md5(getpass.getuser().encode()).hexdigest()[:8], 16) % \
-		(MAX_PORT - MIN_PORT) + MIN_PORT
+def GeneratePort():
+        MAX_PORT = 50000
+        MIN_PORT = 10000
+        BASE_PORT = int(hashlib.md5(getpass.getuser().encode()).hexdigest()[:8], 16) % \
+                (MAX_PORT - MIN_PORT) + MIN_PORT
 
-	return BASE_PORT
-
+        index = 0
+        while True:
+                yield (BASE_PORT + index)
+                index = index + 1
 
 #Start the Backend Servers
 serverApp = web.Application([
 	(r"/", BackendHandler)
 ])
 
-basePort = GetBasePort()
+portGenerator = GeneratePort()
+servers = []
+serverPortRange = []
 
-pid = proc.fork_processes(4, max_restarts=1) #1-Frontend and 3-Backend
-
-if pid != 0: #Not the main process where the frontend server will run
-	server = https.HTTPServer(serverApp)
-	port = basePort + pid
-	server.listen(port)
-	print("Binding backend server on port: " + str(port) + " in processID " + str(pid))
+for i in range(3):
+	while True:
+		server = https.HTTPServer(serverApp)
+		port = next(portGenerator)
+		try:
+			server.listen(port)
+		except Exception as e:
+			continue
+		print("Binding backend server on port:", port)
+		servers.append(server)
+		serverPortRange.append(port)
+		break
 
 #Generate the port numbers in a round-robin
 #fashion to load balance between the
@@ -65,7 +73,7 @@ def RoundRobinPortGenerator(portRange):
 #Whenever a request is received, it is forwarded to
 #one of the backend servers in an asynchronous form
 class FrontendHandler(web.RequestHandler):
-	_portGenerator = RoundRobinPortGenerator([basePort+1, basePort+2, basePort+3])
+	_portGenerator = RoundRobinPortGenerator(serverPortRange)
 	_hostname = None
 
 	def initialize(self):
@@ -89,16 +97,15 @@ class FrontendHandler(web.RequestHandler):
 		http_client.close()
 
 #Start the Load Balancer
-if pid == 0:
-	loadBalancerApp = web.Application([
-		(r"/", FrontendHandler)
-	])
+loadBalancerApp = web.Application([
+	(r"/", FrontendHandler)
+])
 
-	frontend = https.HTTPServer(loadBalancerApp)
-	port = basePort
+frontend = https.HTTPServer(loadBalancerApp)
+port = next(portGenerator)
 
-	print("Binding Frontend server on port: " + str(port) + " in processID: " + str(pid))
-	frontend.listen(port)
+print("Binding Frontend  server on port:", port)
+frontend.listen(port)
 
 #Start the ioloop to listen to start 
 #event listening
