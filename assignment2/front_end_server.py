@@ -29,8 +29,7 @@ class FronEndServer(web.RequestHandler):
 			return
 
 		indexes = yield self.__get_indexes(queryString)
-		print(indexes)
-		#topDocuments = self.__priority_sort_topk(indexes=indexes, top_k=10) #Top 10 documents to be sent back
+		topDocuments = self.__priority_sort_topk(indexes=indexes, top_k=10) #Top 10 documents to be sent back
 		#docSnippets = yield self.__get_doc_snippets(doc_ids=topDocuments)
 
 		#response = self.__pack_response(documents=docSnippets)
@@ -49,13 +48,11 @@ class FronEndServer(web.RequestHandler):
 		http_client = httpc.AsyncHTTPClient()
 		for indexServer in inventory.get_index_servers():
 			try:
-				print("Am here!!")
 				response = yield http_client.fetch(indexServer + "?" + urllib.parse.urlencode(query))
-				print(str(response.body))
-				responseParsed = {}
+				responseParsed = json.loads(str(response.body, 'utf-8'))
 				
 				if 'postings' in responseParsed:
-					indexes.extend(responseParsed)
+					indexes.extend(responseParsed['postings'])
 
 			except httpc.HTTPError as e:
 				continue
