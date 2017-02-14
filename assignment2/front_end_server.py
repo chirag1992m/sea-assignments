@@ -64,6 +64,7 @@ class FrontEndServer(web.RequestHandler):
 			except Exception as e:
 				continue
 
+		http_client.close()
 		return indexes
 
 	def __priority_sort_topk(self, indexes, top_k=10):
@@ -107,6 +108,7 @@ class FrontEndServer(web.RequestHandler):
 			except Exception as e:
 				continue
 
+		http_client.close()		
 		return snippets
 
 	def __pack_response(self, doc_snippets):
