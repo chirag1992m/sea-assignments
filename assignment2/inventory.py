@@ -47,16 +47,16 @@ class Inventory(metaclass=Singleton):
 	def get_index_servers(self):
 		return self.__indexServers
 
-	def get_doc_Servers(self):
+	def get_doc_servers(self):
 		return self.__documentServers
 
 	def get_front_end(self):
 		return self.__frontEnd
 
-	def get_num_indexes(self):
+	def get_num_index_servers(self):
 		return self.__numIndexServers
 
-	def get_doc_indexes(self):
+	def get_num_doc_servers(self):
 		return self.__numDocumentServers
 
 	# Check server authetication

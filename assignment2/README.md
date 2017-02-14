@@ -3,6 +3,10 @@
 
 ### [Assignment Link](http://cs.nyu.edu/courses/spring17/CSCI-GA.3033-006/assignment2.html)
 
+### Platforms used:
+* Python (version > 3.5)
+* [Tornado](http://www.tornadoweb.org/en/stable/)
+
 ## Checkpoint 1 - Front End Server
 
 * Create Inventory Module of Index and Document Servers
@@ -14,3 +18,5 @@
 
 * Index Server Links (Already Running by Professor): [1](http://linserv2.cims.nyu.edu:35315/index?q=personalized), [2](http://linserv2.cims.nyu.edu:35316/index?q=personalized), [3](http://linserv2.cims.nyu.edu:35317/index?q=personalized)
 * Document Server Links (Already Running by Professor): [1](http://linserv2.cims.nyu.edu:35318/doc?id=414&q=personalized), [2](http://linserv2.cims.nyu.edu:35319/doc?id=709&q=personalized), [3](http://linserv2.cims.nyu.edu:35320/doc?id=674&q=personalized)
+
+**To run**: python front\_end\_server.py
