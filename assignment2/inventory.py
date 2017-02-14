@@ -33,38 +33,50 @@ list of document servers
 '''
 class Inventory(metaclass=Singleton):
 	def __init__(self):
-		self._frontEnd = None
-		self._indexServers = []
-		self._documentServers = []
+		self.__frontEnd = None
+		
+		self.__indexServers = []
+		self.__numIndexServers = 0
+
+		self.__documentServers = []
+		self.__numDocumentServers = 0
 
 		self.__port_generator = self.__generate_port()
 
 	# Getter Functions
 	def get_index_servers(self):
-		return self._indexServers
+		return self.__indexServers
 
 	def get_doc_Servers(self):
-		return self._documentServers
+		return self.__documentServers
 
 	def get_front_end(self):
-		return self._frontEnd
+		return self.__frontEnd
 
-	#Check port authetication
+	def get_num_indexes(self):
+		return self.__numIndexServers
+
+	def get_doc_indexes(self):
+		return self.__numDocumentServers
+
+	# Check server authetication
 	def __check_server(self, server):
 		pass
 
 	#Setter Functions
 	def add_index_server(self, server):
 		self.__check_server(server)
-		self._indexServers.append(server)
+		self.__indexServers.append(server)
+		self.__numIndexServers += 1
 
 	def add_doc_server(self, server):
 		self.__check_server(server)
-		self._documentServers.append(server)
+		self.__documentServers.append(server)
+		self.__numDocumentServers += 1
 
 	def set_front_end(self, server):
 		self.__check_server(server)
-		self._frontEnd = server
+		self.__frontEnd = server
 
 	'''
 	Port Generator functionalities
