@@ -51,20 +51,23 @@ class FrontEndServer(web.RequestHandler):
 		indexes = []
 
 		http_client = httpc.AsyncHTTPClient()
-		for indexServer in inventory.get_index_servers():
+		responses = yield [http_client.fetch(indexServer + "?" + urllib.parse.urlencode(query), 
+											raise_error=False) \
+							for indexServer in inventory.get_index_servers()]
+		http_client.close()
+
+		for response in responses:
 			try:
-				response = yield http_client.fetch(indexServer + "?" + urllib.parse.urlencode(query))
+				response.rethrow()
 				responseParsed = json.loads(str(response.body, 'utf-8'))
-				
+
 				if 'postings' in responseParsed:
 					indexes.extend(responseParsed['postings'])
 
-			except httpc.HTTPError as e:
-				continue
 			except Exception as e:
+				print(e)
 				continue
 
-		http_client.close()
 		return indexes
 
 	def __priority_sort_topk(self, indexes, top_k=10):
@@ -90,25 +93,29 @@ class FrontEndServer(web.RequestHandler):
 
 		numDocServers = inventory.get_num_doc_servers()
 		docServers = inventory.get_doc_servers()
-		for docId in doc_ids:
-			try:
-				serverId = (docId % numDocServers)
 
-				query = {'id': docId, 'q': queryString}
-				response = yield http_client.fetch(docServers[serverId] 
-					+ "?" + urllib.parse.urlencode(query))
+		urls = []
+		for docId in doc_ids:
+			serverId = (docId % numDocServers)
+
+			query = {'id': docId, 'q': queryString}
+			urls.append(docServers[serverId] + "?" + urllib.parse.urlencode(query))
+
+		responses = yield [http_client.fetch(url, raise_error=False) for url in urls]
+
+		for response in responses:
+			try:
+				response.rethrow()
 
 				responseParsed = json.loads(str(response.body, 'utf-8'))
-				
 				if 'results' in responseParsed:
 					snippets.extend(responseParsed['results'])
 
-			except httpc.HTTPError as e:
-				continue
 			except Exception as e:
+				print(e)
 				continue
 
-		http_client.close()		
+		http_client.close()
 		return snippets
 
 	def __pack_response(self, doc_snippets):
