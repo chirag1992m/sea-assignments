@@ -29,10 +29,11 @@ class FrontEndServer(web.RequestHandler):
 			self.write("")
 			return
 
-		doc_priorities = yield self.__get_indexes(queryString=queryString)
+		docPriorities = yield self.__get_indexes(queryString=queryString)
+		print(docPriorities)
 
 		#Top 10 documents to be sent back
-		topDocuments = self.__priority_sort_topk(indexes=doc_priorities)
+		topDocuments = self.__get_topk(indexes=docPriorities)
 		
 		#Get the document snippets for these documents
 		docSnippets = yield self.__get_doc_snippets(doc_ids=topDocuments, queryString=queryString)
@@ -62,7 +63,7 @@ class FrontEndServer(web.RequestHandler):
 				responseParsed = json.loads(str(response.body, 'utf-8'))
 
 				if 'postings' in responseParsed:
-					indexes.extend(responseParsed['postings'])
+					indexes = self.__merge_indexes(indexes, responseParsed['postings'])
 
 			except Exception as e:
 				print(e)
@@ -70,19 +71,24 @@ class FrontEndServer(web.RequestHandler):
 
 		return indexes
 
-	def __priority_sort_topk(self, indexes, top_k=10):
-		length = len(indexes)
-		if length == 0:
-			return []
+	def __merge_indexes(self, a, b):
+		merged = []
 
-		indexes.sort(key=lambda x:x[1], reverse=True) # Every entry is doc_id, tf_idf
-		top_k = (top_k if top_k < length else length)
+		while a and b:
+			if a[0][1] > b[0][1]:
+				merged.append(a.pop(0))
+			else:
+				merged.append(b.pop(0))
 
+		return merged + a + b
+
+	def __get_topk(self, indexes, top_k=10):
+		#indexes.sort(key=lambda x:x[1], reverse=True) # Every entry is doc_id, tf_idf
 		doc_ids = []
-		for doc_entry in indexes:
+		for doc_entry in indexes[:top_k]:
 			doc_ids.append(doc_entry[0])
 
-		return doc_ids[:top_k]
+		return doc_ids
 
 	@gen.coroutine
 	def __get_doc_snippets(self, doc_ids, queryString):
