@@ -38,10 +38,10 @@ class DocumentServer:
 	def __init__(self):
 		self.__ports = []
 		self.__doc_stores = []
-		self.__app = []
+		self.__apps = []
 
 	def start_new_server(self, port, doc_store_file):
-		index = self.__load_doc_store(doc_store_file)
+		doc_store = self.__load_doc_store(doc_store_file)
 
 		#Start a new server
 		app = web.Application([
@@ -50,8 +50,9 @@ class DocumentServer:
 		app.listen(port)
 
 		print("Started Document Server on port: ", port)
-		self.__port.append(port)
-		self.__app.append(app)
+		self.__ports.append(port)
+		self.__apps.append(app)
+		self.__doc_stores.append(doc_store)
 
 		inventory = Inventory()
 		inventory.add_doc_server(port)
@@ -67,4 +68,6 @@ def run_document_servers():
 		document_server.start_new_server(inventory.get_port(), document_base_file + str(i) + extension)
 
 if __name__ == "__main__":
-	run_index_servers()
+	run_document_servers()
+
+	iol.IOLoop.current().start()

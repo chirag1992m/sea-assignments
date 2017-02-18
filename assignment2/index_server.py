@@ -37,7 +37,7 @@ class IndexServer:
 	def __init__(self):
 		self.__ports = []
 		self.__indexes = []
-		self.__app = []
+		self.__apps = []
 
 	def start_new_server(self, port, index_file):
 		index = self.__load_index(index_file)
@@ -49,8 +49,9 @@ class IndexServer:
 		app.listen(port)
 
 		print("Started Index Server on port: ", port)
-		self.__port.append(port)
-		self.__app.append(app)
+		self.__ports.append(port)
+		self.__apps.append(app)
+		self.__indexes.append(index)
 
 		inventory = Inventory()
 		inventory.add_index_server(port)
@@ -67,3 +68,5 @@ def run_index_servers():
 
 if __name__ == "__main__":
 	run_index_servers()
+
+	iol.IOLoop.current().start()
