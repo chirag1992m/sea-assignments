@@ -85,10 +85,9 @@ class FrontEndServer:
 
 			return merged + a + b
 
-		def __get_topk(self, indexes, top_k=10):
-			#indexes.sort(key=lambda x:x[1], reverse=True) # Every entry is doc_id, tf_idf
+		def __get_topk(self, indexes, k=10):
 			doc_ids = []
-			for doc_entry in indexes[:top_k]:
+			for doc_entry in indexes[:k]:
 				doc_ids.append(doc_entry[0])
 
 			return doc_ids
