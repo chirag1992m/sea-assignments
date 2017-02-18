@@ -19,130 +19,149 @@ import json
 
 # Class to handle incoming web requests
 # Only handles the GET request
-class FrontEndServer(web.RequestHandler):
+class FrontEndServer:
 
-	#GET request handler
-	@gen.coroutine
-	def get(self):
-		queryString = self.get_query_argument("q", default="", strip=False)
-		if not queryString:
-			self.write("")
-			return
+	'''
+	Internal Requests Handler class
+	'''
+	class ServerHandler(web.RequestHandler):
+		#GET request handler
+		@gen.coroutine
+		def get(self):
+			queryString = self.get_query_argument("q", default="", strip=False)
+			if not queryString:
+				self.write("")
+				return
 
-		docPriorities = yield self.__get_indexes(queryString=queryString)
-		print(docPriorities)
+			docPriorities = yield self.__get_indexes(queryString=queryString)
+			
+			#Top 10 documents to be sent back
+			topDocuments = self.__get_topk(indexes=docPriorities)
+			
+			#Get the document snippets for these documents
+			docSnippets = yield self.__get_doc_snippets(doc_ids=topDocuments, queryString=queryString)
+			
+			response = self.__pack_response(doc_snippets=docSnippets)
+			
+			# Finally Write the response
+			self.write(response)
 
-		#Top 10 documents to be sent back
-		topDocuments = self.__get_topk(indexes=docPriorities)
-		
-		#Get the document snippets for these documents
-		docSnippets = yield self.__get_doc_snippets(doc_ids=topDocuments, queryString=queryString)
-		
-		response = self.__pack_response(doc_snippets=docSnippets)
-		
-		# Finally Write the response
-		self.write(response)
+		@gen.coroutine
+		def __get_indexes(self, queryString=""):
+			inventory = Inventory()
 
-	@gen.coroutine
-	def __get_indexes(self, queryString=""):
-		inventory = Inventory()
+			query = {'q': queryString}
 
-		query = {'q': queryString}
+			indexes = []
 
-		indexes = []
+			http_client = httpc.AsyncHTTPClient()
+			responses = yield [http_client.fetch(indexServer + "?" + urllib.parse.urlencode(query), 
+												raise_error=False) \
+								for indexServer in inventory.get_index_servers()]
+			http_client.close()
 
-		http_client = httpc.AsyncHTTPClient()
-		responses = yield [http_client.fetch(indexServer + "?" + urllib.parse.urlencode(query), 
-											raise_error=False) \
-							for indexServer in inventory.get_index_servers()]
-		http_client.close()
+			for response in responses:
+				try:
+					response.rethrow()
+					responseParsed = json.loads(str(response.body, 'utf-8'))
 
-		for response in responses:
-			try:
-				response.rethrow()
-				responseParsed = json.loads(str(response.body, 'utf-8'))
+					if 'postings' in responseParsed:
+						indexes = self.__merge_indexes(indexes, responseParsed['postings'])
 
-				if 'postings' in responseParsed:
-					indexes = self.__merge_indexes(indexes, responseParsed['postings'])
+				except Exception as e:
+					print(e)
+					continue
 
-			except Exception as e:
-				print(e)
-				continue
+			return indexes
 
-		return indexes
+		def __merge_indexes(self, a, b):
+			merged = []
 
-	def __merge_indexes(self, a, b):
-		merged = []
+			while a and b:
+				if a[0][1] > b[0][1]:
+					merged.append(a.pop(0))
+				else:
+					merged.append(b.pop(0))
 
-		while a and b:
-			if a[0][1] > b[0][1]:
-				merged.append(a.pop(0))
-			else:
-				merged.append(b.pop(0))
+			return merged + a + b
 
-		return merged + a + b
+		def __get_topk(self, indexes, top_k=10):
+			#indexes.sort(key=lambda x:x[1], reverse=True) # Every entry is doc_id, tf_idf
+			doc_ids = []
+			for doc_entry in indexes[:top_k]:
+				doc_ids.append(doc_entry[0])
 
-	def __get_topk(self, indexes, top_k=10):
-		#indexes.sort(key=lambda x:x[1], reverse=True) # Every entry is doc_id, tf_idf
-		doc_ids = []
-		for doc_entry in indexes[:top_k]:
-			doc_ids.append(doc_entry[0])
+			return doc_ids
 
-		return doc_ids
+		@gen.coroutine
+		def __get_doc_snippets(self, doc_ids, queryString):
+			inventory = Inventory()
 
-	@gen.coroutine
-	def __get_doc_snippets(self, doc_ids, queryString):
-		inventory = Inventory()
+			snippets = []
+			http_client = httpc.AsyncHTTPClient()
 
-		snippets = []
-		http_client = httpc.AsyncHTTPClient()
+			numDocServers = inventory.get_num_doc_servers()
+			docServers = inventory.get_doc_servers()
 
-		numDocServers = inventory.get_num_doc_servers()
-		docServers = inventory.get_doc_servers()
+			urls = []
+			for docId in doc_ids:
+				serverId = (docId % numDocServers)
 
-		urls = []
-		for docId in doc_ids:
-			serverId = (docId % numDocServers)
+				query = {'id': docId, 'q': queryString}
+				urls.append(docServers[serverId] + "?" + urllib.parse.urlencode(query))
 
-			query = {'id': docId, 'q': queryString}
-			urls.append(docServers[serverId] + "?" + urllib.parse.urlencode(query))
+			responses = yield [http_client.fetch(url, raise_error=False) for url in urls]
 
-		responses = yield [http_client.fetch(url, raise_error=False) for url in urls]
+			for response in responses:
+				try:
+					response.rethrow()
 
-		for response in responses:
-			try:
-				response.rethrow()
+					responseParsed = json.loads(str(response.body, 'utf-8'))
+					if 'results' in responseParsed:
+						snippets.extend(responseParsed['results'])
 
-				responseParsed = json.loads(str(response.body, 'utf-8'))
-				if 'results' in responseParsed:
-					snippets.extend(responseParsed['results'])
+				except Exception as e:
+					print(e)
+					continue
 
-			except Exception as e:
-				print(e)
-				continue
+			http_client.close()
+			return snippets
 
-		http_client.close()
-		return snippets
+		def __pack_response(self, doc_snippets):
+			result_dict = {"num_results": len(doc_snippets), 
+							"results": doc_snippets}
 
-	def __pack_response(self, doc_snippets):
-		result_dict = {"num_results": len(doc_snippets), 
-						"results": doc_snippets}
+			return json.dumps(result_dict, ensure_ascii=False)
 
-		return json.dumps(result_dict, ensure_ascii=False)
+	'''
+	Server Functions
+	'''
+	def __init__(self, port):
+		self.__port = port
+		self.__app = None
+
+	def start(self):
+		if self.__app is None:
+			self.__app = web.Application([
+				(r"/search", FrontEndServer.ServerHandler)
+			])
+
+			self.__app.listen(self.__port)
+
+			inventory = Inventory()
+			inventory.set_front_end(self.__port)
+			print("Started Front-End Server on port: ", self.__port)
+
+def run_front_end():
+	inventory = Inventory()
+	front_end_server = FrontEndServer(inventory.get_port())
+	front_end_server.start()
 
 # Main code to start the front-end server
 if __name__ == "__main__":
+	run_front_end()
+
 	inventory = Inventory()
-
-	app = web.Application([
-		(r"/search", FrontEndServer)
-	])
-	port = inventory.get_port()
-
-	app.listen(port)
-	inventory.set_front_end(port)
-	print("Front-End Server: ", port)
-
 	inventory.add_index_server("http://linserv2.cims.nyu.edu:35315/index")
 	inventory.add_index_server("http://linserv2.cims.nyu.edu:35316/index")
 	inventory.add_index_server("http://linserv2.cims.nyu.edu:35317/index")
