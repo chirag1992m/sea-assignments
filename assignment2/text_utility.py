@@ -11,7 +11,9 @@ Text Based Utilities
 import nltk
 import string
 
-class StringCleaner:
+from singleton import Singleton
+
+class StringCleaner(metaclass=Singleton):
 	def __init__(self):
 		self.__punctuations = set(string.punctuation)
 		self.__stop_words = set(nltk.corpus.stopwords.words('english'))
@@ -34,8 +36,8 @@ class StringCleaner:
 
 	def process_string(self, queryString):
 		wordVector = self.__tokenize(queryString)
-		stripPunctuations = self.__remove_punctuations(wordVector)
-		stemmedWords = self.__stem_word(stripPunctuations)
-		stripStopwords = self.__remove_stop_words(stemmedWords)
+		wordVector = self.__remove_punctuations(wordVector)
+		#wordVector = self.__stem_word(wordVector)
+		wordVector = self.__remove_stop_words(wordVector)
 
-		return self.__clean_empty(stripStopwords)
+		return self.__clean_empty(wordVector)
