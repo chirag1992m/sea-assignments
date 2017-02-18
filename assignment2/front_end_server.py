@@ -20,11 +20,17 @@ import json
 # Class to handle incoming web requests
 # Only handles the GET request
 class FrontEndServer:
+	_hostname = None
 
 	'''
 	Internal Requests Handler class
 	'''
 	class ServerHandler(web.RequestHandler):
+		def initialize(self):
+			if FrontEndServer._hostname is None:
+				index = self.request.host.index(':')
+				FrontEndServer._hostname = "http://" + self.request.host[:index+1]
+
 		#GET request handler
 		@gen.coroutine
 		def get(self):
@@ -55,7 +61,8 @@ class FrontEndServer:
 			indexes = []
 
 			http_client = httpc.AsyncHTTPClient()
-			responses = yield [http_client.fetch(indexServer + "?" + urllib.parse.urlencode(query), 
+			responses = yield [http_client.fetch(FrontEndServer._hostname + str(indexServer) + "/index?" \
+												+ urllib.parse.urlencode(query), 
 												raise_error=False) \
 								for indexServer in inventory.get_index_servers()]
 			http_client.close()
@@ -107,7 +114,8 @@ class FrontEndServer:
 				serverId = (docId % numDocServers)
 
 				query = {'id': docId, 'q': queryString}
-				urls.append(docServers[serverId] + "?" + urllib.parse.urlencode(query))
+				urls.append(FrontEndServer._hostname + str(docServers[serverId]) + \
+							"/doc?" + urllib.parse.urlencode(query))
 
 			responses = yield [http_client.fetch(url, raise_error=False) for url in urls]
 
