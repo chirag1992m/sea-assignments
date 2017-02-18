@@ -106,22 +106,23 @@ class Indexer:
 			self.__add_document_to_index(self.__numDocuments, docParsed)
 
 		self.__make_tf_idf()
-
-		print(self.__inverted_indexes_partitioned)
+		
 
 	def write_index_to_file(self):
 		baseIndexFile = "index_posting_"
 		baseDocumentFile = "document_posting_"
 
+		extension = ".index"
+
 		for idx, indexes in enumerate(self.__inverted_indexes_partitioned):
-			pickle.dump(indexes, baseIndexFile + str(idx))
+			pickle.dump(indexes, open(baseIndexFile + str(idx) + extension, "wb"), protocol=3)
 
 		for idx, docStore in enumerate(self.__document_store_partitioned):
-			pickle.dump(docStore, baseDocumentFile + str(idx))
+			pickle.dump(docStore, open(baseDocumentFile + str(idx) + extension, "wb"), protocol=3)
 
 def run():
-	indexer = Indexer(2, 2, "wiki_dataset.xml")
-	Indexer.write_index_to_file()
+	indexer = Indexer(3, 3, "wiki_dataset.xml")
+	indexer.write_index_to_file()
 
 if __name__ == "__main__":
 	run()
