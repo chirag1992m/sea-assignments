@@ -11,19 +11,7 @@ Involved in this Search Engine
 import hashlib
 import getpass #Get current user info
 
-'''
-We want only one instance of the inventory class
-and thus use the SingleTon Pattern
-using the metaclass functionality
-'''
-class Singleton(type):
-	_instances = {}
-
-	def __call__(cls, *args, **kwargs):
-		if cls not in cls._instances:
-			cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
-		return cls._instances[cls]
-
+from singleton import Singleton
 '''
 Inventory class
 Singleton Object (Only one instance exist)
