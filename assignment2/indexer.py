@@ -120,9 +120,9 @@ class Indexer:
 		for idx, docStore in enumerate(self.__document_store_partitioned):
 			pickle.dump(docStore, open(baseDocumentFile + str(idx) + extension, "wb"), protocol=3)
 
-def run():
+def run_indexer():
 	indexer = Indexer(3, 3, "wiki_dataset.xml")
 	indexer.write_index_to_file()
 
 if __name__ == "__main__":
-	run()
+	run_indexer()
