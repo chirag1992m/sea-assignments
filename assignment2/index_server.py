@@ -19,6 +19,8 @@ import tornado.gen as gen
 import pickle
 import json
 
+import text_utility as tu
+
 class IndexServer:
 	
 	'''
@@ -28,10 +30,64 @@ class IndexServer:
 		def initialize(self, database):
 			self.__database = database
 
+		def __get_query(self):
+			return self.get_query_argument("q", default="", strip=False)
+
+		def __pack_result(self, results):
+			result_dict = {"postings": results}
+			return json.dumps(result_dict, ensure_ascii=False)
+
+		def __write_result(self, results):
+			self.write(self.__pack_result(results))
+
+		def __closest_results(self, scores, k=10):
+			closest_results = []
+			for doc, score in scores.items():
+				if score > 0:
+					closest_results.append((doc, score))
+
+			closest_results.sort(key=lambda x:x[1], reverse=True)
+
+			return closest_results[:k]
+
+
+		def __get_doc_scores(self, query_vector):
+			scores = {}
+			query_count = {}
+
+			for word in query_vector:
+				if word in query_count:
+					query_count[word] += 1
+				else:
+					query_count[word] = 1
+
+			for word, count in query_count.items():
+				if word in self.__database:
+					for doc, doc_count in self.__database[word].items():
+						score = count * doc_count
+						if doc in scores:
+							scores[doc] += score
+						else:
+							scores[doc] = score
+			return scores
+
+		def __get_results(self, query):
+			#Writing an empty result if no query is provided
+			if not query:
+				return []
+
+			queryVector = tu.StringCleaner().process_string(query)
+			scores = self.__get_doc_scores(queryVector)
+
+			return self.__closest_results(scores)
+
 		#GET request handler
 		@gen.coroutine
 		def get(self):
-			self.write(self.__database)
+			queryString = self.__get_query()
+
+			self.__write_result(self.__get_results(queryString))
+
 
 	def get_index(self):
 		return self.__index
