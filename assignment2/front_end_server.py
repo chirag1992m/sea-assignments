@@ -148,14 +148,17 @@ class FrontEndServer:
 
 			self.__app.listen(self.__port)
 
+			print("Started Front-End Server on port: ", self.__port)
+
 			inventory = Inventory()
 			inventory.set_front_end(self.__port)
-			print("Started Front-End Server on port: ", self.__port)
 
 def run_front_end():
 	inventory = Inventory()
 	front_end_server = FrontEndServer(inventory.get_port())
 	front_end_server.start()
+
+	return front_end_server
 
 # Main code to start the front-end server
 if __name__ == "__main__":
