@@ -27,6 +27,8 @@
 * Creates inverted indexes for the index servers partitioned across document
 * Creates document indexes for the document servers partitioned across document
 
+**TODO**: Give Bonus to Title words
+
 **To run**: python indexer.py
 
 ## Checkpoint 3 - Index and Document Server

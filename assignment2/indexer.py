@@ -68,7 +68,7 @@ class Indexer:
 		self.__numDocuments = 0
 
 	def __add_document_to_index(self, doc_id, doc_info):
-		bonus = 1
+		bonus = 1 #TODO
 		indexServer = (doc_id % self.__numInvertedIndexes)
 		docServer = (doc_id % self.__numDocumentIndexes)
 
