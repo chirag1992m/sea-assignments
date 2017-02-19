@@ -12,6 +12,8 @@ and outputs a pickled data for all the indexes constructed
 import pickle
 import os.path as path
 
+from math import log
+
 import dataset_parser as dp
 
 class Indexer:
@@ -91,9 +93,26 @@ class Indexer:
 
 			self.__inverted_indexes_partitioned[indexServer][word][doc_id] += 1
 
+	def __get_word_global_count(self, word):
+		count = 0
+		for idx in range(len(self.__inverted_indexes_partitioned)):
+			if word in self.__inverted_indexes_partitioned[idx]:
+				count += len(self.__inverted_indexes_partitioned[idx][word].keys())
+		return count
+
+	def __calc_idf(self, word):
+		idf = log(self.__numDocuments / float(self.__get_word_global_count(word)))
+		if(idf < 0):
+			print("Something wrong! Please check!")
+
+		return idf
+
 	def __make_tf_idf(self):
-		#TODO
-		pass
+		for idx in range(len(self.__inverted_indexes_partitioned)):
+			for word, inverted_index in self.__inverted_indexes_partitioned[idx].items():
+				idf = self.__calc_idf(word)
+				for doc_id in self.__inverted_indexes_partitioned[idx][word]:
+					self.__inverted_indexes_partitioned[idx][word][doc_id] *= idf
 
 	def __populate_indexes(self, refresh=True):
 		if not refresh:
