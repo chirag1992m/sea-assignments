@@ -27,8 +27,6 @@
 * Creates inverted indexes for the index servers partitioned across document
 * Creates document indexes for the document servers partitioned across document
 
-**TODO**: Give Bonus to Title words
-
 **To run**: python indexer.py
 
 ## Checkpoint 3 - Index and Document Server
@@ -44,8 +42,6 @@
 * Starts a document server at the address /doc
 * Index server loads the document index into memory
 * Given a query, returns the information of a specific document and a specific query
-
-**TODO**: snippet creation code
 
 **To run**: python document\_server.py
 

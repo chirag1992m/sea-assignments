@@ -20,6 +20,8 @@ import tornado.gen as gen
 import pickle
 import json
 
+import text_utility as tu
+
 class DocumentServer:
 	
 	'''
@@ -45,9 +47,37 @@ class DocumentServer:
 		def __error_result(self):
 			return {"doc_id": "INVALID", "snippet": "", "title": "", "url": ""}
 
-		def __get_doc_snippet(self, doc_text, query_string):
-			#TODO
-			return doc_text
+		def __bold_word(self, word):
+			return "<strong>" + word + "</strong>"
+
+		def __get_highlighted_text(self, text, query_vector):
+			text_vector = text.split(" ")
+
+			for idx, word in enumerate(text_vector):
+				for query in query_vector:
+					if word.lower() == query.lower():
+						text_vector[idx] = self.__bold_word(word)
+
+			return " ".join(text_vector)
+
+		def __get_doc_snippet(self, doc_text, query_vector):
+			text_vector = doc_text.split(" ")
+
+			snippet = ""
+			max_count = 3
+			count = 0
+			for idx, word in enumerate(text_vector):
+				for query in query_vector:
+					if word.lower() == query.lower():
+						snippet = snippet + " ".join(text_vector[idx-11:idx+11]) + " ... "
+						count += 1
+						if count >= max_count:
+							break
+
+				if count >= max_count:
+							break
+
+			return self.__get_highlighted_text(snippet, query_vector)
 
 		def __get_result(self, query):
 			doc_id = query['id']
@@ -56,11 +86,12 @@ class DocumentServer:
 			else:
 				return self.__error_result()
 
+			query_words = tu.StringCleaner().process_string(query['q'])
 			result = {
 				'doc_id': doc_id,
-				'snippet': self.__get_doc_snippet(doc_info[2], query['q']),
+				'snippet': self.__get_doc_snippet(doc_info[2], query_words),
 				'url': doc_info[1],
-				'title': doc_info[0]
+				'title': self.__get_highlighted_text(doc_info[0], query_words)
 			}
 
 			return result
