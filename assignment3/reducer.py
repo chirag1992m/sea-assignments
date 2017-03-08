@@ -1,6 +1,7 @@
 from tornado.ioloop import IOLoop
 from tornado import gen, httpclient, web
 import json, urllib, subprocess
+import pickle
 
 class Reducer(web.RequestHandler):
     
@@ -33,9 +34,9 @@ class Reducer(web.RequestHandler):
         kv_string = "\n".join([pair[0] + "\t" + pair[1] for pair in kv_pairs])
         p = subprocess.Popen(reducer_path, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
         (out, _) = p.communicate(kv_string.encode())
-        print(out.decode())
+        pickle.dump(out.decode(), open(job_path + '/' + str(reducer_ix) + '.out', "wb"))
 
-        self.write(json.encode({'status': 'success'}))
+        self.write(json.dumps({'status': 'success'}))
 
 if __name__ == "__main__":
     app = web.Application([
