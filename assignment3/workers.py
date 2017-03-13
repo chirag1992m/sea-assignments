@@ -6,7 +6,8 @@ Course: Search Engine Architecture
 Workers
 Main Job is to start the workers as 
 reducers and mappers and print out their
-hostnames on the console
+hostnames on the console.
+The servers run on different forked subprocesses
 '''
 import mapper, reducer
 import inventory
@@ -31,16 +32,17 @@ class WorkerServer(object):
 			except Exception as e:
 				print(e)
 				print("Cannot start server on port: ", self.__port)
-				return
+				return False
 
-			print("Started Worker on port: ", self.__port)
 			self.__app = app
+		return True
 
 
 def start_workers():
 	pid = proc.fork_processes(inventory.NUM_WORKERS)
 
-	WorkerServer(inventory.WORKER_PORTS[pid]).start()
+	if WorkerServer(inventory.WORKER_PORTS[pid]).start():
+		print("Started Worker on port: ", self.__port, "with sub-process-id: ", pid)
 	iol.current().start()
 
 if __name__ == "__main__":
