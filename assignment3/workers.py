@@ -42,7 +42,7 @@ def start_workers():
 	pid = proc.fork_processes(inventory.NUM_WORKERS)
 
 	if WorkerServer(inventory.WORKER_PORTS[pid]).start():
-		print("Started Worker on port: ", self.__port, "with sub-process-id: ", pid)
+		print("Started Worker on port: ", inventory.WORKER_PORTS[pid], "with sub-process-id: ", pid)
 	iol.current().start()
 
 if __name__ == "__main__":

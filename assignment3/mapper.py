@@ -1,3 +1,11 @@
+# -*- coding: UTF-8 -*-
+'''
+Name: Chirag Maheshwari
+Course: Search Engine Architecture
+
+Mappers
+Handles the map request
+'''
 from tornado import web, gen
 import json, subprocess
 import hashlib
@@ -75,7 +83,7 @@ class Map(web.RequestHandler):
 	def get(self):
 		self._fetch_arguments()
 		self._emit_data()
-		self.write(json.dumps(self._get_response()))
+		self.write(self._get_response())
 
 class Output(web.RequestHandler):
 
