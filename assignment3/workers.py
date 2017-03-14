@@ -20,14 +20,16 @@ class WorkerServer(object):
 		self.__app = None
 		self.__port = port
 
+		self._mapped_data = {}
+
 	def start(self):
 		if self.__app is None:
 			try:
 				app = web.Application([
 					(r'/reduce', reducer.Reduce),
 					(r'/retrieve_reduce_output', reducer.Output),
-					(r'/map', mapper.Map),
-					(r'/retrieve_map_output', mapper.Output)])
+					(r'/map', mapper.Map, dict(database=self)),
+					(r'/retrieve_map_output', mapper.Output, dict(database=self))])
 				app.listen(self.__port)
 			except Exception as e:
 				print(e)
@@ -37,6 +39,40 @@ class WorkerServer(object):
 			self.__app = app
 		return True
 
+	def add_mapped_data(self, task_id, reducer_idx, data):
+		reducer_idx = str(reducer_idx)
+		if task_id not in self._mapped_data:
+			self._mapped_data[task_id] = {}
+
+		if reducer_idx not in self._mapped_data[task_id]:
+			self._mapped_data[task_id][reducer_idx] = []
+
+		print("am here!!!!")
+		self._mapped_data[task_id][reducer_idx].append(data)
+
+	def is_mapped_data(self, task_id, reducer_idx):
+		if task_id not in self._mapped_data:
+			return False
+
+		reducer_idx = str(reducer_idx)
+		if reducer_idx not in self._mapped_data[task_id]:
+			return False
+
+		return True
+
+	def get_mapped_data(self, task_id, reducer_idx):
+		if not self.is_mapped_data(task_id, reducer_idx):
+			return []
+
+		return self._mapped_data[task_id][str(reducer_idx)]
+
+	def delete_mapped_data(self, task_id, reducer_idx):
+		if not self.is_mapped_data(task_id, reducer_idx):
+			return []
+
+		del self._mapped_data[task_id][str(reducer_idx)]
+		if not self._mapped_data[task_id]:
+			del self._mapped_data[task_id]
 
 def start_workers():
 	pid = proc.fork_processes(inventory.NUM_WORKERS)

@@ -11,9 +11,9 @@ import json, subprocess
 import hashlib
 import random
 
-mapped_data = {}
-
 class Map(web.RequestHandler):
+	def initialize(self, database):
+		self.__database = database
 
 	def _fetch_arguments(self):
 		self._mapper_path = self.get_query_argument(
@@ -38,17 +38,14 @@ class Map(web.RequestHandler):
 		return (int(hashlib.md5(key.encode()).hexdigest()[:10], 16) % self._num_reducers)
 
 	def _store_data(self, data):
-		mapped_data[self._task_id] = {}
-		
-		for i in range(self._num_reducers):
-			mapped_data[self._task_id][str(i)] = []
-
 		for line in data:
 			line = line.strip()
 			if line:
 				key, val = line.split('\t')
 				reducer_index = self._get_reducer_index(key)
-				mapped_data[self._task_id][str(reducer_index)].append(
+				self.__database.add_mapped_data(
+					self._task_id, 
+					reducer_index,
 					(key, val))
 
 
@@ -83,9 +80,13 @@ class Map(web.RequestHandler):
 	def get(self):
 		self._fetch_arguments()
 		self._emit_data()
-		self.write(self._get_response())
+		response = self._get_response()
+		print(response)
+		self.write(response)
 
 class Output(web.RequestHandler):
+	def initialize(self, database):
+		self.__database = database
 
 	def _fetch_arguments(self):
 		self._reducer_idx = int(self.get_query_argument(
@@ -97,22 +98,24 @@ class Output(web.RequestHandler):
 			default="",
 			strip=False)
 
-	def _fetch_response(self):
+	def _get_response(self):
 		if self._map_task_id:
-			if self._map_task_id in mapped_data:
-				if str(self._reducer_idx) in mapped_data[self._map_task_id]:
-					toReturn = json.dumps(mapped_data[self._map_task_id][str(self._reducer_idx)])
-					del mapped_data[self._map_task_id][str(self._reducer_idx)]
-					if not mapped_data[self._map_task_id]:
-						del mapped_data[self._map_task_id]
-					return toReturn
+			print(self.__database._mapped_data)
+			toReturn = json.dumps(self.__database.get_mapped_data(
+				self._map_task_id,
+				self._reducer_idx))
+			self.__database.delete_mapped_data(
+				self._map_task_id,
+				self._reducer_idx)
 
-		return json.dumps([])
+		return toReturn
 
 	@gen.coroutine
 	def get(self):
 		self._fetch_arguments()
-		self.write(self._fetch_response())
+		response = self._get_response()
+		print(response)
+		self.write(response)
 
 if __name__ == "__main__":
     pass

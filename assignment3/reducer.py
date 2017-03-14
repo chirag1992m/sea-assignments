@@ -69,7 +69,7 @@ class Reduce(web.RequestHandler):
 
 		return responses
 
-	def _write_response(self):
+	def _get_response(self):
 		if self._status:
 			return {'status': 'success'}
 		else:
@@ -80,7 +80,9 @@ class Reduce(web.RequestHandler):
 		self._fetch_arguments()
 		responses = yield self._get_maps()
 		self._emit_data(responses)
-		self.write(self._write_response())
+		response = self._get_response()
+		print(response)
+		self.write(response)
 
 class Output(web.RequestHandler):
 	def _fetch_arguments(self):
@@ -94,7 +96,7 @@ class Output(web.RequestHandler):
 			default="1",
 			strip=False))
 
-	def _write_response(self):
+	def _get_response(self):
 		lines = []
 		for filename in os.listdir(self._job_path):
 			if filename.endswith(".out"):
@@ -109,7 +111,9 @@ class Output(web.RequestHandler):
 	@gen.coroutine
 	def get(self):
 		self._fetch_arguments()
-		self.write(self._write_response())
+		response = self._get_response()
+		print(response)
+		self.write(response)
 
 if __name__ == "__main__":
     pass
