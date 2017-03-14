@@ -81,7 +81,6 @@ class Map(web.RequestHandler):
 		self._fetch_arguments()
 		self._emit_data()
 		response = self._get_response()
-		print(response)
 		self.write(response)
 
 class Output(web.RequestHandler):
@@ -100,7 +99,6 @@ class Output(web.RequestHandler):
 
 	def _get_response(self):
 		if self._map_task_id:
-			print(self.__database._mapped_data)
 			toReturn = json.dumps(self.__database.get_mapped_data(
 				self._map_task_id,
 				self._reducer_idx))
@@ -114,7 +112,6 @@ class Output(web.RequestHandler):
 	def get(self):
 		self._fetch_arguments()
 		response = self._get_response()
-		print(response)
 		self.write(response)
 
 if __name__ == "__main__":

@@ -47,7 +47,6 @@ class WorkerServer(object):
 		if reducer_idx not in self._mapped_data[task_id]:
 			self._mapped_data[task_id][reducer_idx] = []
 
-		print("am here!!!!")
 		self._mapped_data[task_id][reducer_idx].append(data)
 
 	def is_mapped_data(self, task_id, reducer_idx):
