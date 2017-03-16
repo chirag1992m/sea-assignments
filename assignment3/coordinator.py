@@ -81,7 +81,7 @@ def main():
 	for reduce_response in reducers:
 		response = json.loads(reduce_response.body.decode())
 		if response['status'] != 'success':
-			print("Some error in response from mapper. Exiting....")
+			print("Some error in response from reducer. Exiting....")
 			exit()
 
 IOLoop.current().run_sync(main)
