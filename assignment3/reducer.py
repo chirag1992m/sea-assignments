@@ -35,7 +35,6 @@ class Reduce(web.RequestHandler):
 	def _emit_data(self, responses):
 		kv_pairs = []
 		for r in responses:
-			print(r)
 			kv_pairs.extend(json.loads(r.body.decode()))
 		kv_pairs.sort(key=lambda x:x[0])
 
@@ -81,7 +80,6 @@ class Reduce(web.RequestHandler):
 		responses = yield self._get_maps()
 		self._emit_data(responses)
 		response = self._get_response()
-		print(response)
 		self.write(response)
 
 class Output(web.RequestHandler):
@@ -112,7 +110,6 @@ class Output(web.RequestHandler):
 	def get(self):
 		self._fetch_arguments()
 		response = self._get_response()
-		print(response)
 		self.write(response)
 
 if __name__ == "__main__":

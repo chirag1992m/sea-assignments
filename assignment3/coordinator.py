@@ -35,12 +35,13 @@ def map_requests():
 			url = "http://{}/map?{}".format(
 				server, params)
 			futures.append(client.fetch(url))
+			i += 1
 	responses = yield futures
 
 	return responses
 
 @gen.coroutine
-def reduce_requests(joined_map_ids):
+def reduce_requests(map_ids):
 	futures = []
 	client = httpc.AsyncHTTPClient()
 	for i in range(opt.num_reducers):
@@ -48,7 +49,7 @@ def reduce_requests(joined_map_ids):
 		params = urllib.parse.urlencode({
 				'reducer_ix': i,
 				'reducer_path': opt.reducer_path,
-				'map_task_ids': joined_map_ids,
+				'map_task_ids': ",".join(map_ids),
 				'job_path': opt.job_path})
 		url = "http://{}/reduce?{}".format(
 			server, params)
