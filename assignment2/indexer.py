@@ -140,7 +140,7 @@ class Indexer:
 			pickle.dump(docStore, open(baseDocumentFile + str(idx) + extension, "wb"), protocol=3)
 
 def run_indexer():
-	indexer = Indexer(3, 3, "info_ret.xml")
+	indexer = Indexer(3, 3, "data/info_ret.xml")
 	indexer.write_index_to_file()
 
 if __name__ == "__main__":
