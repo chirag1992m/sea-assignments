@@ -23,7 +23,7 @@
 
 ## Checkpoint 2 - Indexer
 
-* Reads the wiki_dataset.xml file
+* Reads the info_ret.xml file
 * Creates inverted indexes for the index servers partitioned across document
 * Creates document indexes for the document servers partitioned across document
 
