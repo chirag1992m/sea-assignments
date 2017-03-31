@@ -9,7 +9,7 @@ Helps in parsing the dataset given
 '''
 '''
 import xml.etree.ElementTree as et
-import text_utility as tu
+from assignment2 import text_utility as tu
 
 class DatasetParser:
 

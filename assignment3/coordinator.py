@@ -7,7 +7,7 @@ Coordinator
 Coordinates between the mappers and reducers
 '''
 import argparse, os, urllib, json
-import inventory
+from assignment3 import inventory
 from tornado import httpclient as httpc, gen
 from tornado.ioloop import IOLoop
 

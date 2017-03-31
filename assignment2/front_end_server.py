@@ -5,7 +5,7 @@ Course: Search Engine Architecture
 
 Front-End Server
 '''
-from inventory import Inventory
+from assignment2.inventory import Inventory
 
 #Import tornado Libraries
 import tornado.web as web

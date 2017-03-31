@@ -6,8 +6,7 @@ Course: Search Engine Architecture
 Inventory
 Constants for different components
 '''
-import hashlib
-import getpass
+import hashlib, getpass
 
 NUM_WORKERS = 4
 

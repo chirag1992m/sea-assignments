@@ -8,7 +8,7 @@ Reads the database file from and loads it into memory
 Starts an index server on a given port
 On a query, gives top K document closest to the query
 '''
-from inventory import Inventory
+from assignment2.inventory import Inventory
 
 #Import tornado Libraries
 import tornado.web as web
@@ -19,7 +19,7 @@ import tornado.gen as gen
 import pickle
 import json
 
-import text_utility as tu
+from assignment2 import text_utility as tu
 
 class IndexServer:
 	

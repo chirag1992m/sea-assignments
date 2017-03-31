@@ -11,7 +11,7 @@ Involved in this Search Engine
 import hashlib
 import getpass #Get current user info
 
-from singleton import Singleton
+from assignment2.singleton import Singleton
 '''
 Inventory class
 Singleton Object (Only one instance exist)

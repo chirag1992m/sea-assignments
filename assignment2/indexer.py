@@ -14,7 +14,7 @@ import os.path as path
 
 from math import log
 
-import dataset_parser as dp
+from assignment2 import dataset_parser as dp
 
 class Indexer:
 

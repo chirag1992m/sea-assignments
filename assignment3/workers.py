@@ -9,8 +9,7 @@ reducers and mappers and print out their
 hostnames on the console.
 The servers run on different forked subprocesses
 '''
-import mapper, reducer
-import inventory
+from assignment3 import mapper, reducer, inventory
 
 from tornado.ioloop import IOLoop as iol
 from tornado import web, process as proc

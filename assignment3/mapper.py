@@ -7,9 +7,7 @@ Mappers
 Handles the map request
 '''
 from tornado import web, gen
-import json, subprocess, io, pickle
-import hashlib
-import random
+import json, subprocess, io, pickle, hashlib, random
 
 class Map(web.RequestHandler):
 	def initialize(self, database):

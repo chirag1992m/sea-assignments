@@ -6,10 +6,7 @@ Course: Search Engine Architecture
 main script to load all the servers
 '''
 
-import front_end_server
-import indexer
-import index_server
-import document_server
+from assignment2 import front_end_server, indexer, index_server, document_server
 
 import tornado.ioloop as iol
 

@@ -9,7 +9,7 @@ Starts a server on given port.
 Given a query document and query, returns a
 document snippet with highlighted query words.
 '''
-from inventory import Inventory
+from assignment2.inventory import Inventory
 
 #Import tornado Libraries
 import tornado.web as web

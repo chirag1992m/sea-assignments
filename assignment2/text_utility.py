@@ -11,7 +11,7 @@ Text Based Utilities
 import nltk
 import string
 
-from singleton import Singleton
+from assignment2.singleton import Singleton
 
 class StringCleaner(metaclass=Singleton):
 	def __init__(self):

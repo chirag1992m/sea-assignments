@@ -8,7 +8,7 @@ Handlers the reduce request
 '''
 from tornado import web, gen, httpclient as httpc
 import json, os, urllib, subprocess, io, pickle
-import inventory
+from assignment3 import inventory
 
 class Reduce(web.RequestHandler):
 	def _fetch_arguments(self):
