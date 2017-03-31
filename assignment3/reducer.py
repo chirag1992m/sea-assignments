@@ -7,7 +7,7 @@ Reducer
 Handlers the reduce request
 '''
 from tornado import web, gen, httpclient as httpc
-import json, os, urllib, subprocess
+import json, os, urllib, subprocess, io, pickle
 import inventory
 
 class Reduce(web.RequestHandler):
@@ -38,15 +38,17 @@ class Reduce(web.RequestHandler):
 			kv_pairs.extend(json.loads(r.body.decode()))
 		kv_pairs.sort(key=lambda x:x[0])
 
-		kv_string = "\n".join([p[0] + '\t' + p[1] for p in kv_pairs])
+		# kv_buffer = "\n".join([p[0] + '\t' + p[1] for p in kv_pairs])
+		kv_buffer = io.BytesIO()
+		for p in kv_pairs:
+			pickle.dump(p, kv_buffer)
 		(out, _) = subprocess.Popen(
 			self._reducer_path, 
 			stdin=subprocess.PIPE, 
 			stdout=subprocess.PIPE).communicate(
-				kv_string.encode())
-		out = out.decode()
-
-		with open(os.path.join(self._job_path, str(self._reducer_id) + ".out"), "w") as f:
+				kv_buffer.getvalue())
+			
+		with open(os.path.join(self._job_path, str(self._reducer_id) + ".out"), "wb") as f:
 			f.write(out)
 			self._status = True
 
@@ -98,11 +100,14 @@ class Output(web.RequestHandler):
 		lines = []
 		for filename in os.listdir(self._job_path):
 			if filename.endswith(".out"):
-				f = os.path.join(self._job_path, filename)
-				lines.append(f + ":")
-				for line in open(f, "r"):
-					lines.append(line)
-				lines.append(" ")
+				filepath = os.path.join(self._job_path, filename)
+				lines.append(filepath + ":")
+				with open(filepath, "rb") as f:
+					while True:
+						try:
+							lines.append(str(pickle.load(f)))
+						except EOFError:
+							break
 
 		return "<br />".join(lines)
 

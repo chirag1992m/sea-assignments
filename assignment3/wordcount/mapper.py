@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
 import sys, nltk
+import pickle
 
 for line in sys.stdin:
-    for word in nltk.word_tokenize(line.strip()):
-        print('%s\t%s' % (word, 1))
+	for word in nltk.word_tokenize(line.strip()):
+		pickle.dump((word, 1), sys.stdout.buffer)

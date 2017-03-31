@@ -7,7 +7,7 @@ Mappers
 Handles the map request
 '''
 from tornado import web, gen
-import json, subprocess
+import json, subprocess, io, pickle
 import hashlib
 import random
 
@@ -38,27 +38,25 @@ class Map(web.RequestHandler):
 		return (int(hashlib.md5(key.encode()).hexdigest()[:10], 16) % self._num_reducers)
 
 	def _store_data(self, data):
-		for line in data:
-			line = line.strip()
-			if line:
-				key, val = line.split('\t')
-				reducer_index = self._get_reducer_index(key)
+		stream = io.BytesIO(data)
+		while True:
+			try:
+				key, val = pickle.load(stream)
+				reducer_index = self._get_reducer_index(str(key))
 				self.__database.add_mapped_data(
-					self._task_id, 
-					reducer_index,
-					(key, val))
+						self._task_id, 
+						reducer_index,
+						(key, val))
+			except EOFError:
+				break
 
 
 	def _emit_data(self):
 		self._status = False
 
-		doc_string = '\n'.join([' '.join(line.split()) 
-			for line in open(self._input_file)])
-
 		p = subprocess.Popen(self._mapper_path, 
 			stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-		(out, _) = p.communicate(doc_string.encode())
-		out = out.decode().split('\n')
+		(out, _) = p.communicate(open(self._input_file, "rb").read())
 
 		self._task_id = self._get_unique_id()
 		self._store_data(out)

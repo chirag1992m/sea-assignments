@@ -2,9 +2,15 @@
 
 from itertools import groupby
 from operator import itemgetter
-import sys
+import sys, pickle
 
-data = map(lambda x: x.strip().split('\t'), sys.stdin)
+data = []
+while True:
+	try:
+		data.append(pickle.load(sys.stdin.buffer))
+	except EOFError:
+		break
+
 for word, group in groupby(data, itemgetter(0)):
     total = sum(int(count) for _, count in group)
-    print('%s\t%d' % (word, total))
+    pickle.dump((word, total), sys.stdout.buffer)

@@ -26,4 +26,9 @@ After running the workers, start the master coordinator to actually do the work 
 python coordinatory.py --mapper_path=<mapper_path> --reducer_path=<reducer_path> --job_path=<job_path> --num_reducers=<Number of reducers>
 ```
 
+After the job completes, see the output using:
+```
+http://localhost:<any_worker_port>/retrieve_reduce_output?job_path=<job_path>
+```
+
 **PS**: To increase/decrease the number of workers, change the constant ``NUM_WORKERS`` inside inventory.py accordingly.
