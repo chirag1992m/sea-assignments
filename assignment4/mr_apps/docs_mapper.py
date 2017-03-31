@@ -9,7 +9,7 @@ def get_doc_id(title):
 def get_url(title):
 	return "https://en.wikipedia.org/wiki/" + title.replace(" ", "_")
 
-def output_doc_term_freq(page):
+def output_doc_store(page):
 	title, text, url = "", "", ""
 	for child in page.iter(None):
 		if child.tag.endswith('title'):

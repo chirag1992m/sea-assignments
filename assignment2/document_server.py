@@ -20,7 +20,7 @@ import tornado.gen as gen
 import pickle
 import json
 
-import text_utility as tu
+from assignment2 import text_utility as tu
 
 class DocumentServer:
 	

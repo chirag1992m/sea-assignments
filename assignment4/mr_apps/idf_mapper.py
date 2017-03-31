@@ -11,7 +11,7 @@ def get_doc_id(title):
 def get_text_vector(text):
 	return nltk.word_tokenize(text)
 
-def output_doc_term_freq(page):
+def output_term_idf(page):
 	title, text = "", ""
 	for child in page.iter(None):
 		if child.tag.endswith('title'):
@@ -31,6 +31,6 @@ def output_doc_term_freq(page):
 while True:
 	try:
 		page = pickle.load(sys.stdin.buffer)
-		output_doc_term_freq(page)
+		output_term_idf(page)
 	except EOFError:
 		break
