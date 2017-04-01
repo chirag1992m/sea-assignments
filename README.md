@@ -4,3 +4,5 @@
 ## Department of Computer Science, Graduate Division
 
 ### [Link to course webpage](http://cs.nyu.edu/courses/spring17/CSCI-GA.3033-006/index.html)
+
+Every Assignment directory contains their respective README file

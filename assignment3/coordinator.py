@@ -13,10 +13,11 @@ from tornado.ioloop import IOLoop
 
 parser = argparse.ArgumentParser(prog="Map-Reduce Framework")
 
-parser.add_argument("--mapper_path", help="Mapper program to run", type=str, default="wordcount/mapper.py")
-parser.add_argument("--reducer_path", help="Reducer program to run", type=str, default="wordcount/reducer.py")
-parser.add_argument("--job_path", help="Job path", type=str, default="fish_jobs")
+parser.add_argument("--mapper_path", help="Mapper program to run", type=str, default="assignment3/wordcount/mapper.py")
+parser.add_argument("--reducer_path", help="Reducer program to run", type=str, default="assignment3/wordcount/reducer.py")
+parser.add_argument("--job_path", help="Job path", type=str, default="assignment3/fish_jobs")
 parser.add_argument("--num_reducers", help="Number of reducers to use", type=int, default=1)
+parser.add_argument("--timeout", help="Timeout for any request", type=float, default=None)
 
 opt = parser.parse_args()
 
@@ -34,7 +35,7 @@ def map_requests():
 				'num_reducers': opt.num_reducers})
 			url = "http://{}/map?{}".format(
 				server, params)
-			futures.append(client.fetch(url))
+			futures.append(client.fetch(url, request_timeout=opt.timeout))
 			i += 1
 	responses = yield futures
 
@@ -53,7 +54,7 @@ def reduce_requests(map_ids):
 				'job_path': opt.job_path})
 		url = "http://{}/reduce?{}".format(
 			server, params)
-		futures.append(client.fetch(url))
+		futures.append(client.fetch(url, request_timeout=opt.timeout))
 	responses = yield futures
 
 	return responses

@@ -134,7 +134,7 @@ def run_document_servers(count=3):
 
 	document_servers = []
 
-	document_base_file = "document_posting_"
+	document_base_file = "assignment3/document_posting_"
 	extension = ".index"
 	for i in range(count):
 		document_server = DocumentServer(inventory.get_port(), document_base_file + str(i) + extension)

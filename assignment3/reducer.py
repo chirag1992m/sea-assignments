@@ -24,12 +24,12 @@ class Reduce(web.RequestHandler):
 
 		self._reducer_path = self.get_query_argument(
 			"reducer_path",
-			default="wordcount/reducer.py",
+			default="assignment3/wordcount/reducer.py",
 			strip=False)
 
 		self._job_path = self.get_query_argument(
 			"job_path",
-			default="fish_jobs",
+			default="assignment3/fish_jobs",
 			strip=False)
 
 	def _emit_data(self, responses):
@@ -88,7 +88,7 @@ class Output(web.RequestHandler):
 	def _fetch_arguments(self):
 		self._job_path = self.get_query_argument(
 			"job_path",
-			default="fish_jobs",
+			default="assignment3/fish_jobs",
 			strip=False)
 
 		self._num_reducers = int(self.get_query_argument(

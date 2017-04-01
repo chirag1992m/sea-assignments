@@ -22,7 +22,7 @@ def output_doc_term_freq(page):
 
 	doc_id = get_doc_id(title)
 	words = get_text_vector(text)
-	words.extend(get_text_vector(title))
+	words.extend(get_text_vector(title) * 3) #*3 boosts the title keywords
 	word_freq = Counter(words)
 
 	for k, v in word_freq.items():

@@ -18,7 +18,13 @@
 
 ### How to run
 * For multiprocessing servers
-python start.py 
+```
+cd path/to/sea-assignments/
+python -m assignment1.start 
+```
 
 * For single process servers
-python start\_singleProcess.py
+```
+cd path/to/sea-assignments/
+python -m assignment1.start_singleProcess
+```

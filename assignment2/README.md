@@ -19,15 +19,23 @@
 * Index Server Links (Already Running by Professor): [1](http://linserv2.cims.nyu.edu:35315/index?q=personalized), [2](http://linserv2.cims.nyu.edu:35316/index?q=personalized), [3](http://linserv2.cims.nyu.edu:35317/index?q=personalized)
 * Document Server Links (Already Running by Professor): [1](http://linserv2.cims.nyu.edu:35318/doc?id=414&q=personalized), [2](http://linserv2.cims.nyu.edu:35319/doc?id=709&q=personalized), [3](http://linserv2.cims.nyu.edu:35320/doc?id=674&q=personalized)
 
-**To run**: python front\_end\_server.py
+**To run**: 
+```
+cd path/to/sea-assignments/ 
+python -m assignment2.front_end_server
+```
 
 ## Checkpoint 2 - Indexer
 
-* Reads the info_ret.xml file
+* Reads the data/info_ret.xml file
 * Creates inverted indexes for the index servers partitioned across document
 * Creates document indexes for the document servers partitioned across document
 
-**To run**: python indexer.py
+**To run**:
+```
+cd path/to/sea-assignments/ 
+python -m assignment2.indexer
+```
 
 ## Checkpoint 3 - Index and Document Server
 
@@ -36,17 +44,29 @@
 * Index server loads the inverted index into memory
 * Given a query, they score all the document using dot product and then return the top 10 results in a JSON format
 
-**To run**: python index\_server.py
+**To run**:
+```
+cd path/to/sea-assignments/ 
+python -m assignment2.index_server
+```
 
 ### Document server
 * Starts a document server at the address /doc
 * Index server loads the document index into memory
 * Given a query, returns the information of a specific document and a specific query
 
-**To run**: python document\_server.py
+**To run**:
+```
+cd path/to/sea-assignments/ 
+python -m assignment2.document_server
+```
 
 ## Checkpoint 4 - Start script
 
 * Starts all the components in one go
 
-**To run**: python start.py
+**To run**:
+```
+cd path/to/sea-assignments/ 
+python -m assignment2.start
+```
