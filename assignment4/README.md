@@ -5,3 +5,25 @@
 
 ### Platforms used:
 * Python (version > 3.5)
+* Tornado (version > 4.4.1)
+* Map-Reduce Framework ([Assignment-3](../assignment3/README.md))
+* Search-Engine Framework ([Assignment-2](../assignment2/README.md))
+
+### File/Directory description:
+* **docs\_jobs**: Job directory for Document Store Map-Reduce task (Task-1)
+* **idf\_jobs**: Job directory for IDF score Map-Reduce task (Task-2)
+* **invindex\_jobs**: Job directory for inverted index partitioned by document Map-Reduce task (Task-3)
+* **mr\_apps**: Contains the mapper and reducer scripts for all the jobs
+* **reformatter.py**: Partitions the dataset into given number of partitions by `document`
+* **reformat\_all.sh**: Bash script to run reformatter for all the different tasks
+* **start.py**: Makes the indexes compatible with the old search-engine architecture created in assignment-2
+
+### How to run:
+~~~~
+cd /path/to/sea-assignments/
+./assignment4/reformat_all.sh
+python -m assignment3.workers & #Note the job id <workers_jid>
+python -m assignment4.start
+kill <workers_jid>
+python -m assignment2.start
+~~~~

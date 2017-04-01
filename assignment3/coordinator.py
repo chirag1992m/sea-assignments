@@ -67,7 +67,7 @@ def main():
 	print("Mappers completed their task")
 	map_task_ids = []
 	for map_response in mappers:
-		print(map_response.request_time)
+		# print(map_response.request_time)
 		response = json.loads(map_response.body.decode())
 		if response['status'] == 'success':
 			map_task_ids.append(response['map_task_id'])
@@ -76,7 +76,7 @@ def main():
 			exit()
 
 	print("Starting reducers...")
-	print(map_task_ids)
+	# print(map_task_ids)
 	reducers = yield reduce_requests(map_task_ids)
 
 	print("Reducers completed their task...")

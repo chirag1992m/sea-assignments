@@ -119,7 +119,7 @@ def run_index_servers(count=3):
 
 	index_servers = []
 
-	index_base_file = "assignment3/index_posting_"
+	index_base_file = "assignment2/index_posting_"
 	extension = ".index"
 	for i in range(count):
 		index_server = IndexServer(inventory.get_port(), index_base_file + str(i) + extension)

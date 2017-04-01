@@ -128,8 +128,8 @@ class Indexer:
 		
 
 	def write_index_to_file(self):
-		baseIndexFile = "assignment3/index_posting_"
-		baseDocumentFile = "assignment3/document_posting_"
+		baseIndexFile = "assignment2/index_posting_"
+		baseDocumentFile = "assignment2/document_posting_"
 
 		extension = ".index"
 
@@ -140,7 +140,7 @@ class Indexer:
 			pickle.dump(docStore, open(baseDocumentFile + str(idx) + extension, "wb"), protocol=3)
 
 def run_indexer():
-	indexer = Indexer(3, 3, "assignment3/data/info_ret.xml")
+	indexer = Indexer(3, 3, "assignment2/data/info_ret.xml")
 	indexer.write_index_to_file()
 
 if __name__ == "__main__":

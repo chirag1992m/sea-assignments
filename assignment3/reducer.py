@@ -105,11 +105,11 @@ class Output(web.RequestHandler):
 				with open(filepath, "rb") as f:
 					while True:
 						try:
-							lines.append(str(pickle.load(f)))
+							lines.append(json.dumps(pickle.load(f), ensure_ascii=False))
 						except EOFError:
 							break
 
-		return "<br />".join(lines)
+		return "<br /><br />".join(lines)
 
 	@gen.coroutine
 	def get(self):

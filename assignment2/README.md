@@ -68,5 +68,6 @@ python -m assignment2.document_server
 **To run**:
 ```
 cd path/to/sea-assignments/ 
+python -m assignment2.indexer
 python -m assignment2.start
 ```
