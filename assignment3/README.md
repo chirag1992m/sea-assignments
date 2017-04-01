@@ -19,7 +19,7 @@ Define an application in form of map-reduce and put it in one directory with the
 After all this is completed, start the workers using the command:
 ```
 cd /path/to/sea-assignments/
-python -m assignment3.workers.py
+python -m assignment3.workers
 ```
 
 After running the workers, start the master coordinator to actually do the work using these workers:
