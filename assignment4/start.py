@@ -2,15 +2,15 @@
 import pickle, os
 
 print("Creating inverted indexes...")
-os.system("python -m assignment3.coordinator --mapper_path=assignment4/mr_apps/invindex_mapper.py --reducer_path=assignment4/mr_apps/invindex_reducer.py --job_path=assignment4/invindex_jobs --num_reducers=3 --timeout=60")
+os.system("python -m assignment3.coordinator --mapper_path=assignment4/mr_apps/invindex_mapper.py --reducer_path=assignment4/mr_apps/invindex_reducer.py --job_path=assignment4/invindex_jobs --num_reducers=3 --timeout=120")
 print("Created inverted indexes!")
 
 print("Creating document stores...")
-os.system("python -m assignment3.coordinator --mapper_path=assignment4/mr_apps/docs_mapper.py --reducer_path=assignment4/mr_apps/docs_reducer.py --job_path=assignment4/docs_jobs --num_reducers=3 --timeout=60")
+os.system("python -m assignment3.coordinator --mapper_path=assignment4/mr_apps/docs_mapper.py --reducer_path=assignment4/mr_apps/docs_reducer.py --job_path=assignment4/docs_jobs --num_reducers=3 --timeout=120")
 print("Created document stores!")
 
 print("Creating IDF...")
-os.system("python -m assignment3.coordinator --mapper_path=assignment4/mr_apps/idf_mapper.py --reducer_path=assignment4/mr_apps/idf_reducer.py --job_path=assignment4/idf_jobs --num_reducers=1 --timeout=60")
+os.system("python -m assignment3.coordinator --mapper_path=assignment4/mr_apps/idf_mapper.py --reducer_path=assignment4/mr_apps/idf_reducer.py --job_path=assignment4/idf_jobs --num_reducers=1 --timeout=120")
 print("Created IDF!")
 
 def move_files(src_path, dst_path, dst_ext):

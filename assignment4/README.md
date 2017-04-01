@@ -22,8 +22,11 @@
 ~~~~
 cd /path/to/sea-assignments/
 ./assignment4/reformat_all.sh
-python -m assignment3.workers & #Note the job id <workers_jid>
+python -m assignment3.workers
+#In a different terminal keeping the above workers running
 python -m assignment4.start
-kill <workers_jid>
+#Now the workers can be killed off if not needed anymore
+
+#Starts the search engine
 python -m assignment2.start
 ~~~~
