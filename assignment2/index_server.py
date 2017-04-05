@@ -16,8 +16,7 @@ import tornado.ioloop as iol
 import tornado.gen as gen
 
 #To handle URLs and server responses and indexes
-import pickle
-import json
+import pickle, json, os
 
 from assignment2 import text_utility as tu
 
@@ -93,7 +92,17 @@ class IndexServer:
 		return self.__index
 
 	def __load_index(self, index_file):
-		return pickle.load(open(index_file, "rb"))
+		index = pickle.load(open(index_file, "rb"))
+		idf_base_path = "assignment2/"
+		for f in os.listdir(idf_base_path):
+			if f.startswith("idf_posting_"):
+				idf_posting = pickle.load(open(os.path.join(idf_base_path, f), "rb"))
+				for word, idf in idf_posting.items():
+					if word in index:
+						for doc_id in index[word]:
+							index[word][doc_id] *= idf
+
+		return index
 
 	def __init__(self, port, index_file):
 		self.__port = port

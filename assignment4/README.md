@@ -16,7 +16,7 @@
 * **mr\_apps**: Contains the mapper and reducer scripts for all the jobs
 * **reformatter.py**: Partitions the dataset into given number of partitions by `document`
 * **reformat\_all.sh**: Bash script to run reformatter for all the different tasks
-* **start.py**: Makes the indexes compatible with the old search-engine architecture created in assignment-2
+* **start.py**: Runs the map-reduce programs using the coordinator in assignment-3 and moves the produced output to be used in assignment-2 search engine
 
 ### How to run:
 ~~~~

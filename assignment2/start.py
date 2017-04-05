@@ -11,7 +11,7 @@ from assignment2 import front_end_server, indexer, index_server, document_server
 import tornado.ioloop as iol
 
 #Run the indexer first
-#indexer.run_indexer()
+indexer.run_indexer()
 
 #Run the document server
 document_server.run_document_servers()

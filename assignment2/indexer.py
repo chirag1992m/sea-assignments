@@ -18,13 +18,24 @@ from assignment2 import dataset_parser as dp
 
 class Indexer:
 
-	def __init__(self, indexServers, docServers, xmlFile):
+	def __init__(self, indexServers, docServers, idfs, xmlFile):
 		self.set_index_servers(indexServers, refresh=False)
 		self.set_document_servers(docServers, refresh=False)
+		self.set_idf_partitions(idfs, refresh=False)
 		self.set_dataset_file(xmlFile, refresh=False)
 
 		self.__clean_indexes()
 		self.__populate_indexes()
+
+	def set_idf_partitions(self, idfs, refresh=True):
+		if not isinstance(idfs, int):
+			raise TypeError("number of IDF partitions should be an integer")
+
+		if idfs < 0:
+			raise ValueError("IDF partitions should be greater than zero")
+
+		self.__numIDFPartitions = idfs
+		self.__populate_indexes(refresh)
 
 	def set_index_servers(self, indexServers, refresh=True):
 		if not isinstance(indexServers, int):
@@ -64,6 +75,10 @@ class Indexer:
 		self.__document_store_partitioned = []
 		for i in range(self.__numDocumentIndexes):
 			self.__document_store_partitioned.append({})
+
+		self.__IDFPartitions = []
+		for i in range(self.__numIDFPartitions):
+			self.__IDFPartitions.append({})
 
 		self.__numDocuments = 0
 
@@ -110,9 +125,11 @@ class Indexer:
 	def __make_tf_idf(self):
 		for idx in range(len(self.__inverted_indexes_partitioned)):
 			for word, inverted_index in self.__inverted_indexes_partitioned[idx].items():
+				partition = (len(word)) % self.__numIDFPartitions
+				if word in self.__IDFPartitions[partition]:
+					continue
 				idf = self.__calc_idf(word)
-				for doc_id in self.__inverted_indexes_partitioned[idx][word]:
-					self.__inverted_indexes_partitioned[idx][word][doc_id] *= idf
+				self.__IDFPartitions[partition][word] = idf
 
 	def __populate_indexes(self, refresh=True):
 		if not refresh:
@@ -130,6 +147,7 @@ class Indexer:
 	def write_index_to_file(self):
 		baseIndexFile = "assignment2/index_posting_"
 		baseDocumentFile = "assignment2/document_posting_"
+		baseIDFFile = "assignment2/idf_posting_"
 
 		extension = ".index"
 
@@ -139,8 +157,11 @@ class Indexer:
 		for idx, docStore in enumerate(self.__document_store_partitioned):
 			pickle.dump(docStore, open(baseDocumentFile + str(idx) + extension, "wb"), protocol=3)
 
+		for idx, idf in enumerate(self.__IDFPartitions):
+			pickle.dump(idf, open(baseIDFFile + str(idx) + extension, "wb"), protocol=3)
+
 def run_indexer():
-	indexer = Indexer(3, 3, "assignment2/data/info_ret.xml")
+	indexer = Indexer(3, 3, 1, "assignment2/data/info_ret.xml")
 	indexer.write_index_to_file()
 
 if __name__ == "__main__":
