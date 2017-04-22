@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import argparse, os, importlib, inventory, urllib, io
+import argparse, os, importlib, inventory, urllib
 import cloudpickle, pickle
 from tornado import httpclient as httpc, gen
 from tornado.ioloop import IOLoop
@@ -43,8 +43,7 @@ def main():
         responses = yield futures
 
         for r in responses:
-            stream = io.BytesIO(r.body)
-            gradient = pickle.load(stream)
+            gradient = pickle.loads(r.body)
             application.update_model(model, gradient)
         print("iteration {} done!".format(i))
 
